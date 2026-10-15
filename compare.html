@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Released / Beta Comparison | STAI-X APRM</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #2b2320; background: #faf6ef; font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; }
+      .compare { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+      .toolbar { padding: 12px 20px; border-bottom: 1px solid rgba(140, 31, 40, 0.16); display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
+      h1 { font-size: 1rem; margin: 0; }
+      .versions { display: flex; gap: 6px; }
+      button { padding: 9px 18px; border: 1px solid #8c1f28; border-radius: 999px; background: transparent; color: #8c1f28; font: inherit; font-size: 0.9rem; cursor: pointer; }
+      button[aria-pressed="true"] { color: #fff; background: #8c1f28; }
+      button:focus-visible { outline: 3px solid #c9a063; outline-offset: 3px; }
+      .status { flex-basis: 100%; margin: 0; color: #574c46; font-size: 0.85rem; }
+      iframe { flex: 1; min-height: 0; width: 100%; border: 0; background: #faf6ef; }
+      @media (max-width: 640px) { .toolbar { padding: 12px; gap: 10px; } h1 { flex-basis: 100%; } }
+    </style>
+  </head>
+  <body>
+    <div class="compare">
+      <header class="toolbar">
+        <h1>STAI-X APRM · Compare Versions</h1>
+        <div class="versions" role="group" aria-label="Website version">
+          <button type="button" data-version="released" aria-pressed="false">Released</button>
+          <button type="button" data-version="beta" aria-pressed="true">Beta</button>
+        </div>
+        <p id="status" class="status" role="status">Beta preview · Switch versions to compare the same page.</p>
+      </header>
+      <iframe id="website" src="/beta/index.html" title="Beta website preview" allow="fullscreen"></iframe>
+    </div>
+    <script>
+      const roots = { released: '/', beta: '/beta/' }
+      const frame = document.getElementById('website')
+      const status = document.getElementById('status')
+      const buttons = [...document.querySelectorAll('[data-version]')]
+      let currentVersion = 'beta'
+      let notice = ''
+      let requestId = 0
+
+      function currentPage() {
+        try {
+          const url = new URL(frame.contentWindow.location.href)
+          if (url.origin !== location.origin) return 'index.html'
+          const root = roots[currentVersion]
+          if (!url.pathname.startsWith(root)) return 'index.html'
+          return (url.pathname.slice(root.length) || 'index.html') + url.search + url.hash
+        } catch {
+          return 'index.html'
+        }
+      }
+
+      function updateToolbar() {
+        const label = currentVersion === 'beta' ? 'Beta' : 'Released'
+        buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.version === currentVersion)))
+        frame.title = `${label} website preview`
+        status.textContent = `${label} preview · ${notice || 'Switch versions to compare the same page.'}`
+      }
+
+      async function switchVersion(version) {
+        if (version === currentVersion) {
+          requestId++
+          updateToolbar()
+          return
+        }
+        const id = ++requestId
+        let page = currentPage()
+        const target = new URL(roots[version] + page, location.origin)
+        notice = ''
+        status.textContent = 'Checking the corresponding page…'
+        try {
+          const response = await fetch(target.pathname + target.search, { method: 'HEAD', cache: 'no-store' })
+          if (id !== requestId) return
+          if (!response.ok) {
+            page = 'index.html'
+            notice = 'This page is unavailable in that version; showing its homepage.'
+          }
+        } catch {
+          if (id !== requestId) return
+          status.textContent = 'Could not check that version. Please try again.'
+          return
+        }
+        currentVersion = version
+        frame.src = roots[version] + page
+        updateToolbar()
+      }
+
+      buttons.forEach((button) => button.addEventListener('click', () => switchVersion(button.dataset.version)))
+      frame.addEventListener('load', updateToolbar)
+    </script>
+  </body>
+</html>
