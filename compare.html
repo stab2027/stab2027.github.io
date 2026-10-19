@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>Released / Beta Comparison | STAI-X APRM</title>
+    <title>Released / Beta Comparison | STAB 2027</title>
     <style>
       * { box-sizing: border-box; }
       body { margin: 0; color: #2b2320; background: #faf6ef; font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; }
@@ -23,7 +23,7 @@
   <body>
     <div class="compare">
       <header class="toolbar">
-        <h1>STAI-X APRM · Compare Versions</h1>
+        <h1>STAB · Compare Versions</h1>
         <div class="versions" role="group" aria-label="Website version">
           <button type="button" data-version="released" aria-pressed="false">Released</button>
           <button type="button" data-version="beta" aria-pressed="true">Beta</button>
@@ -34,6 +34,32 @@
     </div>
     <script>
       const roots = { released: '/', beta: '/beta/' }
+      const pagePaths = {
+        "submission/index.html": "papersubmission/index.html",
+        "awards/index.html": "paperawards/index.html",
+        "proceedings/index.html": "paperproceedings/index.html",
+        "challenge/index.html": "datachallenge/index.html",
+        "exhibition/index.html": "agentexhibition/index.html",
+        "short-courses/index.html": "shortcourse/index.html"
+      }
+      const sectionIds = {
+        'datachallenge/index.html': { timeline: 'datachallengeTimeline', rules: 'datachallengeRules', awards: 'datachallengeAwards' },
+        'agentexhibition/index.html': { timeline: 'agentexhibitionTimeline', submission: 'agentexhibitionSubmission', gallery: 'agentexhibitionGallery', showcase: 'agentexhibitionShowcase' },
+      }
+
+      function correspondingPage(page, version) {
+        const url = new URL(page, location.origin)
+        const currentPath = url.pathname.slice(1)
+        const originalPath = Object.keys(pagePaths).find(key => pagePaths[key] === currentPath) || currentPath
+        const betaPath = pagePaths[originalPath] || originalPath
+        url.pathname = version === 'beta' ? betaPath : originalPath
+        const ids = sectionIds[betaPath] || {}
+        const currentId = url.hash.slice(1)
+        const originalId = Object.keys(ids).find(key => ids[key] === currentId) || currentId
+        if (currentId) url.hash = version === 'beta' ? (ids[originalId] || originalId) : originalId
+        return url.pathname.slice(1) + url.search + url.hash
+      }
+
       const frame = document.getElementById('website')
       const status = document.getElementById('status')
       const buttons = [...document.querySelectorAll('[data-version]')]
@@ -67,7 +93,7 @@
           return
         }
         const id = ++requestId
-        let page = currentPage()
+        let page = correspondingPage(currentPage(), version)
         const target = new URL(roots[version] + page, location.origin)
         notice = ''
         status.textContent = 'Checking the corresponding page…'
