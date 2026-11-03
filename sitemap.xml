@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://stab2027.org.cn/</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/program/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/registration/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/speakers/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/shortcourse/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/venue/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/committee/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/papersubmission/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/datachallenge/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/agentexhibition/index.html</loc>
+  </url>
+  <url>
+    <loc>https://stab2027.org.cn/contact/index.html</loc>
+  </url>
+  <url>
     <loc>https://stab2027.github.io/</loc>
   </url>
   <url>
