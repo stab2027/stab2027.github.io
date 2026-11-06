@@ -47,7 +47,10 @@
 
       function correspondingPage(page, version) {
         const url = new URL(page, location.origin)
-        const currentPath = url.pathname.slice(1)
+        const relativePath = url.pathname.slice(1)
+        const currentPath = !relativePath || relativePath.endsWith('/')
+          ? relativePath + 'index.html'
+          : relativePath
         const originalPath = Object.keys(pagePaths).find(key => pagePaths[key] === currentPath) || currentPath
         const betaPath = pagePaths[originalPath] || originalPath
         url.pathname = version === 'beta' ? betaPath : originalPath
